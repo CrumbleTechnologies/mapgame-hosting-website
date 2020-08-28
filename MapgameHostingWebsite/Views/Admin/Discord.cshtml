@@ -12,9 +12,12 @@
 
     @section Scripts {
         <script>
+            var mapgameID = localStorage.getItem("mapgameID")
+            var mapgameType = localStorage.getItem("mapgameType")
+
             firebase.auth().onAuthStateChanged(function (user) {
                 if (user) {
-                    if (!@ViewData["MapgameID"] == user.email.split("@@")[0]) {
+                    if (!mapgameID == user.email.split("@@")[0]) {
                         window.location.href = "/Admin/Error?errorMessage=missingpermissions"
                     } else {
                         document.getElementById("contents").style.visibility = "visible"

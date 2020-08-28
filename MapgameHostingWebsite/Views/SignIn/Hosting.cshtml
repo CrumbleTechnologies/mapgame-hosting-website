@@ -3,6 +3,7 @@
 }
 
 <div style="text-align: center;">
+    <h1>Hosting Sign in</h1>
     <br />
     <form method="post" onsubmit="return submitForm();">
         <label for="mapgame-id-input">Mapgame ID:</label>
@@ -22,18 +23,9 @@
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 user.getIdTokenResult().then(function (idTokenResult) {
-                    switch (idTokenResult.claims.mapgameType) {
-                        case "discord":
-                            window.location.href = "/Admin/Discord?mapgameID=" + user.email.split("@@")[0]
-                            break;
-
-                        case "web":
-
-                            break;
-
-                        default:
-                            break;
-                    }
+                    window.localStorage.setItem("mapgameType", idTokenResult.claims.mapgameType)
+                    window.localStorage.setItem("mapgameID", user.email.split("@@")[0])
+                    window.location.href = "/Admin"
                 })
             } else {
                 return

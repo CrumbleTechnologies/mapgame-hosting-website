@@ -1,0 +1,25 @@
+﻿@{ 
+    ViewData["Title"] = "Redirecting...";
+}
+
+<div>
+    <h1>Redirecting...</h1>
+
+    <script>
+        var mapgameID = localStorage.getItem("mapgameID")
+        var mapgameType = localStorage.getItem("mapgameType")
+
+        switch (mapgameType) {
+            case "discord":
+                window.location.href = "/Admin/Discord?mapgameID=" + mapgameID
+                break;
+
+            case "web":
+
+                break;
+
+            default:
+                break;
+        }
+    </script>
+</div>

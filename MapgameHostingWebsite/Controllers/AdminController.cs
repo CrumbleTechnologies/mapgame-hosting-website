@@ -11,10 +11,13 @@ namespace MapgameHostingWebsite.Controllers
 {
     public class AdminController : Controller
     {
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         public IActionResult Discord(string mapgameID)
         {
-            ViewData["MapgameID"] = mapgameID;
-
             WebRequest request = WebRequest.Create($"https://discord.com/api/guilds/{mapgameID}");
 
             Console.WriteLine(Environment.GetEnvironmentVariable("DISCORD_BOT_SECRET"));
