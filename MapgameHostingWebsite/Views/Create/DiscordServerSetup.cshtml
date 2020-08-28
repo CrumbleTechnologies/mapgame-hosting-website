@@ -1,0 +1,302 @@
+﻿@{
+    ViewData["Title"] = "Create a mapgame Discord server";
+}
+
+<div>
+    <h1>Set up your mapgame Discord server</h1>
+
+    <h2>@ViewData["ErrorMessage"]</h2>
+
+    <form method="post" onsubmit="return submitServerSetupForm();" action="/Create/CreateDiscordServerPOST?guildID=@ViewData["guildID"]&userID=@ViewData["userID"]&checkKey=@ViewData["checkKey"]" id="server-setup-form">
+        <h3>1. Choose a channel that the bot will welcome members in.</h3>
+        <p id="welcome-channel-display-p">Type in the text box below to search and then click a channel to select it.</p>
+        <input id="welcome-channel-input" type="text" name="welcome-channel-input" placeholder="Choose a channel" list="channel-list" />
+
+        <h3>2. Choose a role that members will receive when they join the server.</h3>
+        <p id="welcome-role-display-p">Type in the text box below to search and then click a role to select it.</p>
+        <input id="welcome-role-input" type="text" name="welcome-role-input" placeholder="Choose a role" list="role-list" />
+
+        <h3>3. Choose a role that moderators have to have to accept or deny nation applications.</h3>
+        <p id="mod-role-display-p">Type in the text box below to search and then click a role to select it.</p>
+        <input id="mod-role-input" type="text" name="mod-role-input" placeholder="Choose a role" list="role-list" />
+
+        <h3>4. Setup your nation application form.</h3>
+        <h4>Click the buttons below to add or remove fields in the form. In the text boxes that appear, type what the user should enter, for example "Nation name". You cannot include '$', '#', '[', ']', '/', '.', or 'username' in the field name. Do not include any fields about their map claim or country colour, the bot will handle that for you.</h4>
+        <button type="button" onclick="addNationFormField();" id="add-field-button" style="height: 20px; width: 40px; font-size: 10px; padding: initial;">Add</button><button type="button" disabled onclick="removeNationFormField();" id="remove-field-button" style="height: 20px; width: 50px; font-size: 10px; padding: initial;">Remove</button>
+        <div id="nation-form-div">
+            <input type="text" name="nation-form-0-input" /><br />
+        </div>
+        <br />
+        <button type="button" onclick="document.getElementById('form-validity-result-h5').innerHTML = checkFormFieldsValidity();">Check fields' validity</button>
+        <h5 id="form-validity-result-h5"></h5>
+
+        <h3>5 (optional). What should users' nicknames be changed to once their nation application has been accepted? Leave this blank to skip.</h3>
+        <h4>Type the template for how users' nicknames should be once their nation has been accepted in the text box below. To insert a field from the form, type the field name with square brackets around it e.g. '[Nation name]'. To insert the user's original username, type '[username]'.</h4>
+        <input type="text" id="nickname-template-input" name="nickname-template-input" onchange="changeValidCheck(2);" />
+        <br />
+        <br />
+        <button type="button" onclick="document.getElementById('nickname-validity-result-h5').innerHTML = checkNicknameTemplateValidity();">Check template's validity</button>
+        <h5 id="nickname-validity-result-h5"></h5>
+
+        <h3>6 (optional). What should nations' channels' be called when being created? Leave this blank to skip and have no channel created for each nation.</h3>
+        <h4>Type the template for how nations' channels should be named once their nation has been accepted in the text box below. To insert a field from the form, type the field name with square brackets around it e.g. '[Nation name]'.</h4>
+        <input type="text" id="channel-template-input" name="channel-template-input" onchange="changeValidCheck(3);" />
+        <br />
+        <br />
+        <button type="button" onclick="document.getElementById('channel-validity-result-h5').innerHTML = checkChannelTemplateValidity();">Check template's validity</button>
+        <h5 id="channel-validity-result-h5"></h5>
+
+        <h3>7 (optional). What category should nations' channels be added to? Leave empty to add channels to the base of the server (no category).</h3>
+        <p id="nation-channel-category-display-p">Type in the text box below to search and then click a channel category to select it.</p>
+        <input id="nation-channel-category-input" type="text" name="nation-channel-category-input" placeholder="Choose a channel" list="category-channel-list" />
+
+        <h3>8. Is your server a <a href="javascript:alert('This is a type of roleplay where members choose a nation by picking tiles from a map and expand a certain amount each day.')">custom nation roleplay</a> or an <a href="javascript:alert('This is a type of roleplay where members choose from a predefined list of nations, for example the countries that fought during World War 2, and can only expand by conquering more territory.')">IRL nation roleplay</a>?</h3>
+        <select id="custom-irl-select" name="custom-irl-select" onchange="customIrlSelectChanged();">
+            <option value="custom">Custom nation roleplay</option>
+            <option value="irl">IRL nation roleplay</option>
+        </select>
+
+        <div id="show-if-custom-nation-rp-div">
+            <h3>9. How many tiles can each nation claim per day?</h3>
+            <input type="number" id="number-of-tiles-input" name="number-of-tiles-input" min="0" />
+        </div>
+
+        <br />
+        <br />
+        <button type="submit">Submit</button>
+
+        <datalist id="channel-list">
+            @foreach (var channel in (List<string[]>)ViewData["DiscordTextChannels"])
+            {
+                <option value="@channel[1]">#@channel[0]</option>
+            }
+        </datalist>
+        <datalist id="role-list">
+            @foreach (var role in (List<string[]>)ViewData["DiscordRoles"])
+            {
+                <option value="@role[1]">@@@role[0]</option>
+            }
+        </datalist>
+        <datalist id="category-channel-list">
+            @foreach (var channel in (List<string[]>)ViewData["DiscordCategoryChannels"])
+            {
+                <option value="@channel[1]">@channel[0]</option>
+            }
+        </datalist>
+    </form>
+
+    @section Scripts {
+    <script>
+        var validCheck1 = true
+        var validCheck2 = true
+        var validCheck3 = true
+
+        var welcomeChannelInput = document.getElementById("welcome-channel-input")
+        var applicationChannelInput = document.getElementById("application-channel-input")
+        var nationChannelCategoryInput = document.getElementById("nation-channel-category-input")
+        var fullChannelList = @Json.Serialize(ViewData["DiscordTextChannels"]);
+        var fullChannelCategoryList = @Json.Serialize(ViewData["DiscordCategoryChannels"]);
+        var channelIDList = []
+        var channelNameList = []
+        for (var i = 0; i < fullChannelList.length; i++) {
+            channelIDList.push(fullChannelList[i][1])
+            channelNameList.push(fullChannelList[i][0])
+        }
+        var channelCategoryIDList = []
+        var channelCategoryNameList = []
+        for (var i = 0; i < fullChannelCategoryList.length; i++) {
+            channelCategoryIDList.push(fullChannelCategoryList[i][1])
+            channelCategoryNameList.push(fullChannelCategoryList[i][0])
+        }
+
+        welcomeChannelInput.onchange = function () {
+            document.getElementById("welcome-channel-display-p").innerHTML = "#" + channelNameList[channelIDList.indexOf(welcomeChannelInput.value)]
+        }
+
+        applicationChannelInput.onchange = function () {
+            document.getElementById("application-channel-display-p").innerHTML = "#" + channelNameList[channelIDList.indexOf(applicationChannelInput.value)]
+        }
+
+        nationChannelCategoryInput.onchange = function () {
+            document.getElementById("nation-channel-category-display-p").innerHTML = channelCategoryNameList[channelCategoryIDList.indexOf(nationChannelCategoryInput.value)]
+        }
+
+        var welcomeRoleInput = document.getElementById("welcome-role-input")
+        var modRoleInput = document.getElementById("mod-role-input")
+        var fullRoleList = @Json.Serialize(ViewData["DiscordRoles"]);
+        var roleIDList = []
+        var roleNameList = []
+        for (var i = 0; i < fullRoleList.length; i++) {
+            roleIDList.push(fullRoleList[i][1])
+            roleNameList.push(fullRoleList[i][0])
+        }
+
+        welcomeRoleInput.onchange = function () {
+            document.getElementById("welcome-role-display-p").innerHTML = "@@" + roleNameList[roleIDList.indexOf(welcomeRoleInput.value)]
+        }
+
+        modRoleInput.onchange = function () {
+            document.getElementById("mod-role-display-p").innerHTML = "@@" + roleNameList[roleIDList.indexOf(modRoleInput.value)]
+        }
+
+        function addNationFormField() {
+            var inputToAdd = document.createElement("input")
+            inputToAdd.type = "text"
+            inputToAdd.name = `nation-form-${document.getElementById("nation-form-div").childElementCount / 2}-input`
+            inputToAdd.onchange = "changeValidCheck(1);"
+            document.getElementById("nation-form-div").appendChild(inputToAdd)
+            document.getElementById("nation-form-div").appendChild(document.createElement("br"))
+            document.getElementById("remove-field-button").disabled = false
+        }
+
+        function removeNationFormField() {
+            document.getElementById("nation-form-div").removeChild(document.getElementById("nation-form-div").lastElementChild)
+            document.getElementById("nation-form-div").removeChild(document.getElementById("nation-form-div").lastElementChild)
+            if (document.getElementById("nation-form-div").childElementCount == 2) {
+                document.getElementById("remove-field-button").disabled = true
+            }
+        }
+
+        function checkFormFieldsValidity() {
+            var checkBool = false
+            for (var i = 0; i < document.getElementById("nation-form-div").childElementCount; i++) {
+                if (document.getElementById("nation-form-div").children[i].value == undefined) {
+                    continue
+                }
+                if (document.getElementById("nation-form-div").children[i].value.includes("$") || document.getElementById("nation-form-div").children[i].value.includes("#") || document.getElementById("nation-form-div").children[i].value.includes("[") || document.getElementById("nation-form-div").children[i].value.includes("]") || document.getElementById("nation-form-div").children[i].value.includes("/") || document.getElementById("nation-form-div").children[i].value.includes(".") || document.getElementById("nation-form-div").children[i].value.includes("username")) {
+                    return "Invalid"
+                } else if (document.getElementById("nation-form-div").children[i].value) {
+                    checkBool = true
+                }
+            }
+
+            if (checkBool) {
+                validCheck1 = true
+                return "Valid"
+            } else {
+                return "Invalid"
+            }
+        }
+
+        function checkNicknameTemplateValidity() {
+            var listOfFields = []
+            for (var i = 0; i < document.getElementById("nation-form-div").childElementCount; i++) {
+                if (document.getElementById("nation-form-div").children[i].tagName == "INPUT" && document.getElementById("nation-form-div").children[i].type == "text") {
+                    listOfFields.push(document.getElementById("nation-form-div").children[i].value)
+                }
+            }
+            var result = checkFieldNameTemplateValidity(document.getElementById("nickname-template-input").value, listOfFields)
+
+            if (result[1] == true) {
+                document.getElementById("nickname-template-input").value = result[0]
+                validCheck2 = true
+                return "Valid"
+            } else {
+                return "Invalid"
+            }
+        }
+
+        function checkChannelTemplateValidity() {
+            var listOfFields = []
+            for (var i = 0; i < document.getElementById("nation-form-div").childElementCount; i++) {
+                if (document.getElementById("nation-form-div").children[i].tagName == "INPUT" && document.getElementById("nation-form-div").children[i].type == "text") {
+                    listOfFields.push(document.getElementById("nation-form-div").children[i].value)
+                }
+            }
+            var result = checkFieldNameTemplateValidity(document.getElementById("channel-template-input").value, listOfFields, false)
+
+            if (result[1] == true) {
+                document.getElementById("channel-template-input").value = result[0]
+                validCheck3 = true
+                return "Valid"
+            } else {
+                return "Invalid"
+            }
+        }
+
+        function checkFieldNameTemplateValidity(template, listOfFields, checkWithUsername = true) {
+            var openSquareBracketIndexes = []
+            var closeSquareBracketIndexes = []
+            for (var i = 0; i < template.length; i++) {
+                switch (template[i]) {
+                    case "[":
+                        openSquareBracketIndexes.push(i)
+                        break;
+
+                    case "]":
+                        closeSquareBracketIndexes.push(i)
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            if (openSquareBracketIndexes.length != closeSquareBracketIndexes.length) return [null, false]
+            if (openSquareBracketIndexes.length == 0) return [null, false]
+
+            if (checkWithUsername) {
+                for (var i = 0; i < openSquareBracketIndexes.length; i++) {
+                    var fieldName = template.substring(openSquareBracketIndexes[i] + 1, closeSquareBracketIndexes[i])
+                    if (fieldName.endsWith(":")) {
+                        fieldName = fieldName.replace(/.$/, "")
+                        template = template.slice(0, closeSquareBracketIndexes[i] - 1) + template.slice(closeSquareBracketIndexes[i])
+                    }
+
+                    if ((!(listOfFields.includes(fieldName))) && (!(fieldName == "username"))) return [null, false]
+                }
+            } else {
+                for (var i = 0; i < openSquareBracketIndexes.length; i++) {
+                    var fieldName = template.substring(openSquareBracketIndexes[i] + 1, closeSquareBracketIndexes[i])
+                    if (fieldName.endsWith(":")) {
+                        fieldName = fieldName.replace(/.$/, "")
+                        template = template.slice(0, closeSquareBracketIndexes[i] - 1) + template.slice(closeSquareBracketIndexes[i])
+                    }
+
+                    if (!(listOfFields.includes(fieldName))) return [null, false]
+                }
+            }
+
+            return [template, true]
+        }
+
+        function customIrlSelectChanged() {
+            switch (document.getElementById("custom-irl-select").value) {
+                case "custom":
+                    document.getElementById("show-if-custom-nation-rp-div").style.visibility = "visible"
+                    break;
+
+                case "irl":
+                    document.getElementById("show-if-custom-nation-rp-div").style.visibility = "collapse"
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        function submitServerSetupForm() {
+            if (validCheck1 && validCheck2 && validCheck3 && document.getElementById("form-validity-result-h5").innerHTML == "Valid" && (document.getElementById("nickname-validity-result-h5").innerHTML == "Valid" || document.getElementById("nickname-validity-result-h5").innerHTML == "") && (document.getElementById("channel-validity-result-h5").innerHTML == "Valid" || document.getElementById("channel-validity-result-h5").innerHTML == "")) {
+                return true
+            } else alert("Make sure to validate all templates, even if they are empty!")
+
+            return false
+        }
+
+        function changeValidCheck(number) {
+            switch (number) {
+                case 1:
+                    validCheck1 = false
+                    break;
+                case 2:
+                    validCheck2 = false
+                    break;
+                case 3:
+                    validCheck3 = false
+                    break;
+                default: break;
+            }
+        }
+    </script>
+    }
+</div>

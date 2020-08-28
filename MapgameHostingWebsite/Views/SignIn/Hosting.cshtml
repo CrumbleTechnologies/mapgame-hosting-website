@@ -1,0 +1,55 @@
+﻿@{ 
+    ViewData["Title"] = "Hosting Sign in";
+}
+
+<div style="text-align: center;">
+    <br />
+    <form method="post" onsubmit="return submitForm();">
+        <label for="mapgame-id-input">Mapgame ID:</label>
+        <input type="text" id="mapgame-id-input" name="mapgame-id-input" />
+        <br />
+        <br />
+        <label for="password-input">Password:</label>
+        <input type="password" id="password-input" name="password-input" />
+        <br />
+        <br />
+        <button>Submit</button>
+    </form>
+    <h5 id="error-message"></h5>
+
+    @section Scripts {
+    <script>
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                user.getIdTokenResult().then(function (idTokenResult) {
+                    switch (idTokenResult.claims.mapgameType) {
+                        case "discord":
+                            window.location.href = "/Admin/Discord?mapgameID=" + user.email.split("@@")[0]
+                            break;
+
+                        case "web":
+
+                            break;
+
+                        default:
+                            break;
+                    }
+                })
+            } else {
+                return
+            }
+        })
+
+        function submitForm() {
+            firebase.auth().signInWithEmailAndPassword(`${document.getElementById("mapgame-id-input").value}@@example.com`, document.getElementById("password-input").value).catch(function (error) {
+                var errorCode = error.code
+                var errorMessage = error.message
+
+                document.getElementById("error-message").innerHTML = "Sign in failed. Please try again.";
+            })
+
+            return false
+        }
+    </script>
+    }
+</div>

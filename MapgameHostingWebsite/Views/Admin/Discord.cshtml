@@ -1,0 +1,29 @@
+﻿@{ 
+    ViewData["Title"] = "Discord Admin Panel";
+}
+
+<div>
+    <div id="loading-div">
+        <h1>Loading...</h1>
+    </div>
+    <div id="contents" style="visibility: collapse;">
+        <h1>@ViewData["DiscordServerName"] - Admin Panel</h1>
+    </div>
+
+    @section Scripts {
+        <script>
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    if (!@ViewData["MapgameID"] == user.email.split("@@")[0]) {
+                        window.location.href = "/Admin/Error?errorMessage=missingpermissions"
+                    } else {
+                        document.getElementById("contents").style.visibility = "visible"
+                        document.getElementById("loading-div").parentNode.removeChild(document.getElementById("loading-div"))
+                    }
+                } else {
+                    window.location.href = "/Admin/Error?errorMessage=missingpermissions"
+                }
+            })
+        </script>
+    }
+</div>

@@ -1,0 +1,14 @@
+﻿@{ 
+    ViewData["Title"] = "Mapgame Created Successfully";
+}
+
+<div style="text-align: center;">
+    <h1>Mapgame created successfully!</h1>
+    @if (ViewData["GeneratedPassword"].ToString() != "none")
+    {
+        <h2>Your Mapgame ID for the admin panel is "@ViewData["MapgameID"]" and your password for the <a>admin panel</a> is "@ViewData["GeneratedPassword"]". Write these down as they will not be shown to you again.</h2>
+    }
+    @if (ViewData["MapgameType"].ToString() == "discord") {
+        <h3>To find out what to do next and how to manage nation applications, click <a href="/Docs/Discord">here</a>.</h3>
+    }
+</div>

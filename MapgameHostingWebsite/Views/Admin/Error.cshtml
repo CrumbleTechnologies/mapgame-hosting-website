@@ -1,0 +1,16 @@
+﻿@{ 
+    ViewData["Title"] = "Admin Error";
+}
+
+<div>
+    <h1>Oops! This is an error.</h1>
+    @switch (ViewData["ErrorMessage"])
+    {
+        case "missingpermissions":
+            <h2>You don't have the permissions to edit this mapgame. Maybe try <a href="/SignIn/Hosting">signing in</a>?</h2>
+            break;
+
+        default:
+            break;
+    }
+</div>

@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mapgame Hosting</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header style="background-color: #004A7F">
+        <div>
+            <ul id="header-inner" style="margin-left: 20px; margin-right: 20px;">
+                <li style="padding-right: 5px;"><img src="~/favicon.ico" style="height: calc(43px - 10px); padding-top: 5px;" /></li>
+                <li><a href="/">Home</a></li>
+                <li><a href="/SignIn/Hosting">Go to admin panel</a></li>
+                <li style="float: right;" id="sign-in-out-li"><a href="/SignIn" id="sign-in-out-a">Loading account status...</a></li>
+            </ul>
+        </div>
+    </header>
+    <div id="main-container">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-auth.js"></script>
+
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyCWzK1jwPePxn2g7B4GJuU8Pfdm-uCwi-c",
+            authDomain: "mapgame-discord-bot.firebaseapp.com",
+            databaseURL: "https://mapgame-discord-bot.firebaseio.com",
+            projectId: "mapgame-discord-bot",
+            storageBucket: "mapgame-discord-bot.appspot.com",
+            messagingSenderId: "842443897049",
+            appId: "1:842443897049:web:f6571c2b5d6ba6871366c8",
+            measurementId: "G-MY4FGP4H5Y"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                document.getElementById("sign-in-out-a").innerHTML = "Sign out"
+                document.getElementById("sign-in-out-a").href = "/SignIn?signOut=true"
+            } else {
+                document.getElementById("sign-in-out-a").innerHTML = "Sign in"
+                document.getElementById("sign-in-out-a").href = "/SignIn"
+            }
+        })
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
