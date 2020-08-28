@@ -3,9 +3,7 @@
 }
 
 body {
-    margin-top: 0;
-    margin-left: 0;
-    margin-right: 0;
+    margin: 0;
 }
 
 #main-container {
@@ -33,16 +31,19 @@ header li {
     vertical-align: text-bottom;
 }
 
+a {
+    text-decoration: none;
+}
+
 header a {
     display: block;
     padding: 8px;
     font-size: 20px;
     color: white;
-    text-decoration: none;
     text-align: center;
 }
 
-header a:hover {
+a:hover {
     text-decoration: underline;
 }
 

@@ -8,22 +8,48 @@
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <header style="background-color: #004A7F">
-        <div>
-            <ul id="header-inner" style="margin-left: 20px; margin-right: 20px;">
-                <li style="padding-right: 5px;"><img src="~/favicon.ico" style="height: calc(43px - 10px); padding-top: 5px;" /></li>
-                <li><a href="/">Home</a></li>
+    <div id="page-container">
+        <div id="full-container">
+            <header style="background-color: #004A7F">
+                <div>
+                    <ul id="header-inner" style="margin-left: 20px; margin-right: 20px;">
+                        <li style="padding-right: 5px;"><img src="~/favicon.ico" style="height: calc(43px - 10px); padding-top: 5px;" /></li>
+                        <li><a href="/">Home</a></li>
 
-                <li style="float: right;" id="sign-in-out-li"><a href="/SignIn" id="sign-in-out-a">Loading account status...</a></li>
-                <li style="float: right;"><a href="/Admin">Go to admin panel</a></li>
-            </ul>
+                        <li style="float: right;" id="sign-in-out-li"><a href="/SignIn" id="sign-in-out-a">Loading account status...</a></li>
+                        <li style="float: right;"><a href="/Admin">Go to admin panel</a></li>
+                    </ul>
+                </div>
+            </header>
+            <div id="main-container">
+                <main role="main">
+                    @RenderBody()
+                </main>
+            </div>
         </div>
-    </header>
-    <div id="main-container">
-        <main role="main">
-            @RenderBody()
-        </main>
+        <footer id="footer" style="margin-left: 2.5%; margin-right: 2.5%;">
+            <h5 style="height: inherit; margin-bottom: 0; margin-top: 0;"><a href="https://github.com/Phyrik/mapgame-hosting-website">View source on Github</a> | Made with ASP.NET Core</h5>
+        </footer>
     </div>
+
+    <style>
+        #page-container {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        #full-container {
+            padding-bottom: 2.5rem;
+        }
+
+        #footer {
+            position: absolute;
+            bottom: 0;
+            width: 95%;
+            height: 2.5rem;
+        }
+    </style>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <!-- The core Firebase JS SDK is always required and must be listed first -->
