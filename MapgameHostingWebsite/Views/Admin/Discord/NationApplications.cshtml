@@ -1,0 +1,81 @@
+﻿@using MapgameHostingWebsite.Models;
+@{ 
+    ViewData["Title"] = "Nation Applications";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div>
+    <h1>Nation Applications</h1>
+
+    <ul id="nation-applications-ul">
+        @foreach (var nationApplication in ViewData["NationApplications"] as Dictionary<string, NationApplication>)
+        {
+        <li class="nation-application-li" id="nation-application-li-@nationApplication.Key">
+            <h2 style="margin-top: 0;">@( (ViewData["NationApplicationsMembers"] as Dictionary<string, string>)[nationApplication.Key] ):</h2>
+            <h4>Fields:</h4>
+            <ul>
+                @foreach (var field in ViewData["NationApplicationFields"] as string[])
+                {
+                    <li>@field: @nationApplication.Value.fields[field]</li>
+                }
+            </ul>
+            @switch (nationApplication.Value.status)
+            {
+                case "pendingApproval":
+                    <h4>Map Claim: </h4>
+                    <img src="/res/images/@( (ViewData["NationApplicationsMapClaims"] as Dictionary<string, string>)[nationApplication.Key] )" width="1000" />
+                    <h4>Status: Pending Approval</h4>
+                    <style>
+                        #nation-application-li-@nationApplication.Key {
+                            background-color: #FAFE83;
+                        }
+                    </style>
+                    break;
+
+                case "accepted":
+                    <h4>Status: Accepted</h4>
+                    <style>
+                        #nation-application-li-@nationApplication.Key {
+                            background-color: #6CFE7B;
+                        }
+                    </style>
+                    break;
+
+                case "rejected":
+                    <h4>Status: Rejected</h4>
+                    <style>
+                        #nation-application-li-@nationApplication.Key {
+                            background-color: #FE6C6C;
+                        }
+                    </style>
+                    break;
+
+                case "cancelled":
+                    <h4>Status: Cancelled by creator</h4>
+                    <style>
+                        #nation-application-li-@nationApplication.Key
+                        {
+                            background-color: #CCCCCC;
+                        }
+                    </style>
+                    break;
+
+                default:
+                    <h4>Status: Unknown</h4>
+                    break;
+            }
+        </li>
+        }
+    </ul>
+
+    <style>
+        .nation-application-li {
+            border: 1px solid gray;
+            padding: 10px;
+        }
+
+        #nation-applications-ul {
+            list-style: none;
+        }
+    </style>
+</div>

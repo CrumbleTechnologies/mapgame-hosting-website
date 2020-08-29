@@ -17,7 +17,7 @@ namespace MapgameHostingWebsite.Controllers
 {
     public class CreateController : Controller
     {
-        static private string databaseSecret = "wr2pZ3bDvvQJtbltVRoNza2k7jQRuc1GD0FwtLGN";
+        static private string databaseSecret = Environment.GetEnvironmentVariable("FIREBASE_DATABASE_SECRET");
         static private FirebaseClient firebaseDatabaseClient = new FirebaseClient(
             "https://mapgame-discord-bot.firebaseio.com/",
             new FirebaseOptions

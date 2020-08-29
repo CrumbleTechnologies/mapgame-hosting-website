@@ -49,9 +49,13 @@ namespace MapgameHostingWebsite
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+                    name: "admin",
+                    pattern: "Admin/{action}/{page?}",
+                    defaults: new { controller = "Admin" });
+                endpoints.MapControllerRoute(
                     name: "create",
                     pattern: "Create/{action=New}/{type?}",
-                    defaults: new { controller = "Create"});
+                    defaults: new { controller = "Create" });
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

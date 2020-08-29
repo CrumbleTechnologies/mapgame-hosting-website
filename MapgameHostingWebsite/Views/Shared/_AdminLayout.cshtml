@@ -1,0 +1,80 @@
+﻿@{
+    Layout = "_Layout.cshtml";
+}
+
+<div id="loading-div">
+    <h1>Loading...</h1>
+</div>
+<div id="side-nav">
+    <a href="/Admin/Discord?mapgameID=@ViewData["MapgameID"]">Admin Home</a>
+    <a href="/Admin/Discord/NationApplications?mapgameID=@ViewData["MapgameID"]">Nation Applications</a>
+</div>
+<div id="contents" style="visibility: collapse;">
+    @RenderBody()
+</div>
+
+<style>
+    #side-nav {
+        height: 100%;
+        width: 160px;
+        position: fixed;
+        z-index: 1;
+        top: 43px;
+        left: 0;
+        background-color: #004A7F;
+        overflow-x: hidden;
+        padding-top: 20px;
+    }
+
+        #side-nav a {
+            padding: 6px 8px 6px 16px;
+            text-decoration: none;
+            font-size: 20px;
+            color: white;
+            display: block;
+        }
+
+            #side-nav a:hover {
+                text-decoration: underline;
+            }
+
+    #contents {
+        margin-left: 160px;
+        padding: 0px 10px;
+    }
+
+    @@media screen and (max-height: 450px) {
+        #side-nav {
+            padding-top: 15px;
+        }
+
+            #side-nav a {
+                font-size: 18px;
+            }
+    }
+
+    footer {
+        margin-left: calc(160px + 2.5%) !important;
+        width: calc(100vw - 160px - (2.5% * 2)) !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+            var mapgameID = localStorage.getItem("mapgameID")
+            var mapgameType = localStorage.getItem("mapgameType")
+
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    if (!mapgameID == user.email.split("@@")[0]) {
+                        window.location.href = "/Admin/Error?errorMessage=missingpermissions"
+                    } else {
+                        document.getElementById("contents").style.visibility = "visible"
+                        document.getElementById("loading-div").parentNode.removeChild(document.getElementById("loading-div"))
+                    }
+                } else {
+                    window.location.href = "/Admin/Error?errorMessage=missingpermissions"
+                }
+            })
+    </script>
+}

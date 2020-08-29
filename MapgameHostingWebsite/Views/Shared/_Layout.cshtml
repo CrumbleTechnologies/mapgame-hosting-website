@@ -17,7 +17,7 @@
                         <li><a href="/">Home</a></li>
 
                         <li style="float: right;" id="sign-in-out-li"><a href="/SignIn" id="sign-in-out-a">Loading account status...</a></li>
-                        <li style="float: right;"><a href="/Admin">Go to admin panel</a></li>
+                        <li style="float: right; visibility: collapse;" id="admin-panel-li"><a href="/Admin">Go to admin panel</a></li>
                     </ul>
                 </div>
             </header>
@@ -47,6 +47,15 @@
             bottom: 0;
             width: 95%;
             height: 2.5rem;
+        }
+
+        header {
+            top: 0;
+            position: fixed;
+        }
+
+        #main-container {
+            padding-top: 43px;
         }
     </style>
 
@@ -78,6 +87,7 @@
             if (user) {
                 document.getElementById("sign-in-out-a").innerHTML = "Sign out"
                 document.getElementById("sign-in-out-a").href = "/SignIn?signOut=true"
+                document.getElementById("admin-panel-li").style.visibility = "visible";
             } else {
                 document.getElementById("sign-in-out-a").innerHTML = "Sign in"
                 document.getElementById("sign-in-out-a").href = "/SignIn"
