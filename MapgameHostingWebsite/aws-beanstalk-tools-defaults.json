@@ -1,0 +1,24 @@
+
+{
+    "region" : "eu-west-2",
+    "configuration" : "Release",
+    "framework"     : "netcoreapp3.1",
+    "self-contained" : false,
+    "application"    : "MapgameHostingWebsite",
+    "environment"    : "MapgameHostingWebsite-prod",
+    "enable-xray"    : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-27346e44\";\"aws:ec2:vpc,Subnets\"=\"subnet-89f8b7e0\"",
+    "proxy-server"         : "nginx",
+    "solution-stack"       : "64bit Windows Server Core 2019 v2.5.8 running IIS 10.0",
+    "environment-type"     : "SingleInstance",
+    "cname"                : "mapgamehostingwebsite-prod",
+    "instance-type"        : "t2.micro",
+    "key-pair"             : "",
+    "instance-profile"     : "aws-elasticbeanstalk-ec2-role",
+    "service-role"         : "aws-elasticbeanstalk-service-role",
+    "profile"              : "default",
+    "health-check-url"     : "/",
+    "iis-website"          : "Default Web Site",
+    "app-path"             : "/"
+}

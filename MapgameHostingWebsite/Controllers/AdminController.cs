@@ -5,14 +5,13 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using Amazon.S3.Model;
 using Firebase.Database;
 using Firebase.Database.Query;
-using Imgur.API.Authentication;
-using Imgur.API.Endpoints;
-using Imgur.API.Models;
 using MapgameHostingWebsite.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +30,10 @@ namespace MapgameHostingWebsite.Controllers
             });
 
         public readonly IWebHostEnvironment env;
+
+        private const string s3BucketName = "mapgame-hosting-website-bucket";
+        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUWest2;
+        private static IAmazonS3 s3Client;
 
         public AdminController(IWebHostEnvironment env)
         {
@@ -56,6 +59,8 @@ namespace MapgameHostingWebsite.Controllers
                         Dictionary<string, NationApplication> nationApplicationsDictionary = new Dictionary<string, NationApplication> { };
                         Dictionary<string, string> nationApplicationsMembersDictionary = new Dictionary<string, string> { };
                         Dictionary<string, string> nationApplicationsMapClaimsDictionary = new Dictionary<string, string> { };
+                        s3Client = new AmazonS3Client(Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID"), Environment.GetEnvironmentVariable("AWS_SECRET_KEY"), bucketRegion);
+                        TransferUtility fileTransferUtility = new TransferUtility(s3Client);
                         for (int i = 0; i < firebaseNationApplications.Count; i++)
                         {
                             nationApplicationsDictionary.Add(firebaseNationApplications.ElementAt(i).Key, firebaseNationApplications.ElementAt(i).Object);
@@ -76,16 +81,31 @@ namespace MapgameHostingWebsite.Controllers
 
                             Bitmap baseMap = new Bitmap(env.WebRootFileProvider.GetFileInfo("res/images/epic-map.png").CreateReadStream());
 
-                            MapClaim mapClaim = ParseMapCode(firebaseNationApplications.ElementAt(i).Object.mapClaimCode);
+                            MapClaim mapClaim = ParseMapCode(firebaseNationApplications.ElementAt(i).Object.MapClaimCode);
 
-                            for (int j = 0; j < mapClaim.length; j++)
+                            for (int j = 0; j < mapClaim.Length; j++)
                             {
-                                FloodFill(baseMap, new Point(mapClaim.locations[j].x, mapClaim.locations[j].y), Color.White, mapClaim.colours[j]);
+                                FloodFill(baseMap, new Point(mapClaim.Locations[j].X, mapClaim.Locations[j].Y), Color.White, mapClaim.Colours[j]);
                             }
 
-                            string filename = GenerateImageFileName() + ".png";
-                            baseMap.Save("wwwroot/res/images/" + filename);
-                            nationApplicationsMapClaimsDictionary.Add(firebaseNationApplications.ElementAt(i).Key, filename);
+                            Bitmap changedMap = new Bitmap(baseMap);
+
+                            string generatedFilename = GenerateImageFileName(env);
+
+                            MemoryStream ms = new MemoryStream();
+                            changedMap.Save(ms, ImageFormat.Png);
+
+                            fileTransferUtility.Upload(ms, s3BucketName, generatedFilename + ".png");
+
+                            GetPreSignedUrlRequest urlRequest = new GetPreSignedUrlRequest
+                            {
+                                BucketName = s3BucketName,
+                                Key = generatedFilename + ".png",
+                                Expires = DateTime.Now.AddMinutes(5),
+                            };
+                            string urlString = s3Client.GetPreSignedURL(urlRequest);
+
+                            nationApplicationsMapClaimsDictionary.Add(firebaseNationApplications.ElementAt(i).Key, urlString);
                         }
                         ViewData["NationApplications"] = nationApplicationsDictionary;
                         ViewData["NationApplicationsMembers"] = nationApplicationsMembersDictionary;
@@ -188,17 +208,17 @@ namespace MapgameHostingWebsite.Controllers
         }
         #endregion
 
-        private static string GenerateImageFileName()
+        private static string GenerateImageFileName(IWebHostEnvironment env)
         {
             Random random = new Random();
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             int length = 20;
             string filename = new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
-            if (!System.IO.File.Exists("res/images/" + filename + ".png")) {
+            if (!System.IO.File.Exists(env.WebRootPath + "/res/images/" + filename + ".png")) {
                 return filename;
             } else
             {
-                return GenerateImageFileName();
+                return GenerateImageFileName(env);
             }
         }
     }

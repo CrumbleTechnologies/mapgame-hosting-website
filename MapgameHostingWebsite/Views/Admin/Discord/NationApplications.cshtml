@@ -16,14 +16,14 @@
             <ul>
                 @foreach (var field in ViewData["NationApplicationFields"] as string[])
                 {
-                    <li>@field: @nationApplication.Value.fields[field]</li>
+                    <li>@field: @nationApplication.Value.Fields[field]</li>
                 }
             </ul>
-            @switch (nationApplication.Value.status)
+            @switch (nationApplication.Value.Status)
             {
                 case "pendingApproval":
                     <h4>Map Claim: </h4>
-                    <img src="/res/images/@( (ViewData["NationApplicationsMapClaims"] as Dictionary<string, string>)[nationApplication.Key] )" width="1000" />
+                    <img src="@( (ViewData["NationApplicationsMapClaims"] as Dictionary<string, string>)[nationApplication.Key] )" width="1000" />
                     <h4>Status: Pending Approval</h4>
                     <style>
                         #nation-application-li-@nationApplication.Key {

@@ -7,8 +7,8 @@ namespace MapgameHostingWebsite.Models
 {
     public class NationApplication
     {
-        public Dictionary<string, string> fields { get; set; }
-        public string mapClaimCode { get; set; }
-        public string status { get; set; }
+        public Dictionary<string, string> Fields { get; set; }
+        public string MapClaimCode { get; set; }
+        public string Status { get; set; }
     }
 }
