@@ -77,7 +77,7 @@ namespace MapgameHostingWebsite.Controllers
 
                             JObject responseJObject2 = JObject.Parse(responseText2);
 
-                            nationApplicationsMembersDictionary.Add(responseJObject2["id"].ToString(), responseJObject2["username"].ToString());
+                            nationApplicationsMembersDictionary.Add(responseJObject2["id"].ToString(), responseJObject2["username"].ToString() + "#" + responseJObject2["discriminator"].ToString());
 
                             Bitmap baseMap = new Bitmap(env.WebRootFileProvider.GetFileInfo("res/images/epic-map.png").CreateReadStream());
 

@@ -12,7 +12,7 @@
         {
         <li class="nation-application-li" id="nation-application-li-@nationApplication.Key">
             <h2 style="margin-top: 0;">@( (ViewData["NationApplicationsMembers"] as Dictionary<string, string>)[nationApplication.Key] ):</h2>
-            <h4>Fields:</h4>
+            <h4>Registration Form Fields:</h4>
             <ul>
                 @foreach (var field in ViewData["NationApplicationFields"] as string[])
                 {
@@ -51,7 +51,7 @@
                     break;
 
                 case "cancelled":
-                    <h4>Status: Cancelled by creator</h4>
+                    <h4>Status: Cancelled by Creator</h4>
                     <style>
                         #nation-application-li-@nationApplication.Key
                         {
