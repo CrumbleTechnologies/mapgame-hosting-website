@@ -36,6 +36,9 @@ namespace MapgameHostingWebsite.Controllers
                     case "discord":
                         return View("New/Discord");
 
+                    case "new":
+                        return View("New/Web");
+
                     default:
                         break;
                 }
