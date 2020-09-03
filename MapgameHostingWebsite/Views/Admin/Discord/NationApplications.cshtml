@@ -88,15 +88,17 @@
         <script>
         function acceptApplication(discordUserId) {
             if (confirm("Are you sure you want to accept this nation application?")) {
-                firebase.database().ref(`discord-servers/@ViewData["MapgameID"]/nationApplications/${discordUserId}/status`).set("accepted")
-                location.reload()
+                firebase.database().ref(`discord-servers/@ViewData["MapgameID"]/nationApplications/${discordUserId}/status`).set("accepted").then(function () {
+                    location.reload()
+                })
             }
             }
 
             function rejectApplication(discordUserId) {
             if (confirm("Are you sure you want to reject this nation application?")) {
-                firebase.database().ref(`discord-servers/@ViewData["MapgameID"]/nationApplications/${discordUserId}/status`).set("rejected")
-                location.reload()
+                firebase.database().ref(`discord-servers/@ViewData["MapgameID"]/nationApplications/${discordUserId}/status`).set("rejected").then(function () {
+                    location.reload()
+                })                
             }
         }
         </script>
