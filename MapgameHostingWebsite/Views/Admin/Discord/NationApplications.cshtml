@@ -11,64 +11,65 @@
     <ul id="nation-applications-ul">
         @foreach (var nationApplication in ViewData["NationApplications"] as Dictionary<string, NationApplication>)
         {
-            <li class="nation-application-li" id="nation-application-li-@nationApplication.Key">
-                <h2 style="margin-top: 0;">@( (ViewData["NationApplicationsMembers"] as Dictionary<string, string>)[nationApplication.Key] ):</h2>
-                <h4>Registration Form Fields:</h4>
-                <ul>
-                    @foreach (var field in ViewData["NationApplicationFields"] as string[])
-                    {
-                        <li>@field: @nationApplication.Value.Fields[field]</li>
-                    }
-                </ul>
-                @switch (nationApplication.Value.Status)
+        <li class="nation-application-li" id="nation-application-li-@nationApplication.Key">
+            <h2 style="margin-top: 0;">@( (ViewData["NationApplicationsMembers"] as Dictionary<string, string>)[nationApplication.Key] ):</h2>
+            <h4>Registration Form Fields:</h4>
+            <ul>
+                @foreach (var field in ViewData["NationApplicationFields"] as string[])
                 {
-                    case "pendingApproval":
-                        <h4>Map Claim: </h4>
-                        <img src="@( (ViewData["NationApplicationsMapClaims"] as Dictionary<string, string>)[nationApplication.Key] )" width="1000" />
-                        <h4>Status: Pending Approval</h4>
-                        <style>
+                    <li>@field: @nationApplication.Value.Fields[field]</li>
+                }
+            </ul>
+            @switch (nationApplication.Value.Status)
+            {
+                case "pendingApproval":
+                    <h4>Map Claim: </h4>
+                    <img src="@( (ViewData["NationApplicationsMapClaims"] as Dictionary<string, string>)[nationApplication.Key] )" width="1000" />
+                    <h4>Status: Pending Approval</h4>
+                    <style>
                         #nation-application-li-@nationApplication.Key {
                             background-color: #FAFE83;
                         }
-                        </style>
-                        <br />
-                        <br />
-                        <button onclick="acceptApplication('@nationApplication.Key');">Accept application</button>
-                        break;
+                    </style>
+                    <br />
+                    <br />
+                    <button onclick="acceptApplication('@nationApplication.Key');">Accept application</button>
+                    <button onclick="rejectApplication('@nationApplication.Key');">Reject application</button>
+                    break;
 
-                    case "accepted":
-                        <h4>Status: Accepted</h4>
-                        <style>
+                case "accepted":
+                    <h4>Status: Accepted</h4>
+                    <style>
                         #nation-application-li-@nationApplication.Key {
                             background-color: #6CFE7B;
                         }
-                        </style>
-                        break;
+                    </style>
+                    break;
 
-                    case "rejected":
-                        <h4>Status: Rejected</h4>
-                        <style>
+                case "rejected":
+                    <h4>Status: Rejected</h4>
+                    <style>
                         #nation-application-li-@nationApplication.Key {
                             background-color: #FE6C6C;
                         }
-                        </style>
-                        break;
+                    </style>
+                    break;
 
-                    case "cancelled":
-                        <h4>Status: Cancelled by Creator</h4>
-                        <style>
+                case "cancelled":
+                    <h4>Status: Cancelled by Creator</h4>
+                    <style>
                         #nation-application-li-@nationApplication.Key
                         {
                             background-color: #CCCCCC;
                         }
-                        </style>
-                        break;
+                    </style>
+                    break;
 
-                    default:
-                        <h4>Status: Unknown</h4>
-                        break;
-                }
-            </li>
+                default:
+                    <h4>Status: Unknown</h4>
+                    break;
+            }
+        </li>
         }
     </ul>
 
@@ -88,6 +89,13 @@
         function acceptApplication(discordUserId) {
             if (confirm("Are you sure you want to accept this nation application?")) {
                 firebase.database().ref(`discord-servers/@ViewData["MapgameID"]/nationApplications/${discordUserId}/status`).set("accepted")
+                location.reload()
+            }
+            }
+
+            function rejectApplication(discordUserId) {
+            if (confirm("Are you sure you want to reject this nation application?")) {
+                firebase.database().ref(`discord-servers/@ViewData["MapgameID"]/nationApplications/${discordUserId}/status`).set("rejected")
                 location.reload()
             }
         }
