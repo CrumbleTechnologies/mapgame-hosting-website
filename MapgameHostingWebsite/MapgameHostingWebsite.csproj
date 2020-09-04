@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include=".ebextenstions\AWS_Single_LetsEncrypt.config" />
+    <Folder Include=".ebextenstions\" />
   </ItemGroup>
 
 </Project>
