@@ -330,6 +330,9 @@ namespace MapgameHostingWebsite.Controllers
             }
             #endregion
 
+            List<string> newListOfMapgames = firebaseDatabaseClient.Child("mapgames").Child("list-of-mapgames").OnceSingleAsync<List<string>>().Result;
+            newListOfMapgames.Add(guildID);
+            await firebaseDatabaseClient.Child("mapgames").Child("list-of-mapgame-ids").PutAsync(newListOfMapgames);
             return Redirect($"/Create/MapgameCreated?type=discord&genPass={generatedPassword}&mapgameID={guildID}");
         }
 
